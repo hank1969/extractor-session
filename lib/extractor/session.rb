@@ -197,8 +197,8 @@ module Extractor
       when 200
         new_cookies = parse_cookies(response)
         self.cookies['leo_auth_token'] = new_cookies['leo_auth_token']
-        #self.cookies['visit'] = new_cookies.fetch('visit')
-        self.cookies['lang'] = new_cookies.fetch('lang')
+        self.cookies['visit'] = new_cookies['visit']
+        self.cookies['lang'] = new_cookies['lang']
         self.cookies['liap'] = true
       when 403
         raise Extractor::NotAuthorizedError.new(response)
