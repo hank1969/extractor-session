@@ -381,7 +381,7 @@ module Extractor
             }
           )
           case response.code.to_i
-          when 302
+          when 303
             if response.header['location'] =~ %r{(?:/feed/|/check/add-phone)$}
               return handle_login_success_response(response)
             else
