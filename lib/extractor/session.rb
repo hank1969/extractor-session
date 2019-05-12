@@ -336,12 +336,11 @@ module Extractor
       response = post('/checkpoint/challenge/verify',
         headers: {
           'content-type' => 'application/x-www-form-urlencoded',
-          'authority' => URI(http.base_uri).host,
           'cookie' => (cookies.merge(
             'chp_token' => @chp_token,
             'RT' => @rt
           ).each.map{ |k,v| '%s="%s"' % [k,v] }.join('; ')),
-          'referer' => 'https://' + URI(http.base_uri).host + '/',
+          'referer' => path
         },
         follow_redirects: false,
         body: URI.encode_www_form(
