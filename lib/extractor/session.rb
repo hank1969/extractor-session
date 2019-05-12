@@ -345,6 +345,7 @@ module Extractor
         follow_redirects: false,
         body: URI.encode_www_form(
           'challengeData' => input_value('challengeData', response.body),
+          'challengeId' => input_value('challengeId', response.body),
           'challengeDetails' => input_value('challengeDetails', response.body),
           'challengeSource' => input_value('challengeSource', response.body),
           'challengeType' => input_value('challengeType', response.body),
