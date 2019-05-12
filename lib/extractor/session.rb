@@ -366,6 +366,30 @@ module Extractor
         else
           raise StandardError.new(response)
         end
+      when 303
+        if response.header['location'] =~ %r{/checkpoint/lg/login-challenge-submit}
+          path = 'https://' + URI(http.base_uri).host + response.header['location']
+          response = get(path,
+            headers: {
+              'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+              'accept-language' => 'en-US,en;',
+              'cookie' => (cookies.each.map{ |k,v| '%s="%s"' % [k,v] }.join('; ')),
+              'referer' => 'https://' + URI(http.base_uri).host + '/uas/login?trk=hb_signin',
+            }
+          )
+          case response.code.to_i
+          when 302
+            if response.header['location'] =~ %r{(?:/feed/|/check/add-phone)$}
+              return handle_login_success_response(response)
+            else
+              raise StandardError.new(response)
+            end
+          else
+            raise StandardError.new(response)
+          end
+        else
+          raise StandardError.new(response)
+        end
       when 503
         warn '///// RETRY(%s)...' % path
         sleep 10
