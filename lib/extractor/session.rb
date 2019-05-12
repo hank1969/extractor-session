@@ -317,7 +317,7 @@ module Extractor
     def handle_email_challenge2(response)
       warn "------------------ GOT EMAIL CHALLENGE 2 --------------------"
 
-      path = URI(response.header['location']).path
+      path = URI(response.header['location']).request_uri
       @chp_token = parse_cookies(response)['chp_token']
       @rt = ('s=%d&r=%s' % [Time.now.to_i + 86353, 'https://' + URI(http.base_uri).host + '/'])
       response = get(path,
