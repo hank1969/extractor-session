@@ -213,7 +213,7 @@ module Extractor
     end
 
     def submit_login!(body)
-      login_csrf_param = %r{<input name="loginCsrfParam" id="loginCsrfParam-login" type="hidden" value="(.+?)"/>}.match(body)[1]
+      login_csrf_param = %r{<input type="hidden" name="csrfToken" value="(.+?)"/>}.match(body)[1]
       response = post('/uas/login-submit',
         follow_redirects: false,
         headers: {
