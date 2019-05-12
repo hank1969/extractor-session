@@ -168,7 +168,7 @@ module Extractor
     private
 
     def get_login_page!
-      response = get('/')
+      response = get('/login')
       case response.code
       when 200
         self.cookies = parse_cookies(response)
@@ -230,8 +230,11 @@ module Extractor
       )
       case response.code
       when 302
+      when 303
         if response.header['location'] =~ %r{/uas/consumer-email-challenge$}
           handle_email_challenge(response)
+        elsif response.header['location'] =~ %r{/checkpoint/challenge}
+          handle_email_challenge2(response)
         elsif response.header['location'] =~ %r{/uas/account-restricted}
           raise Extractor::NotAuthorizedError.new(response)
         else
@@ -303,6 +306,70 @@ module Extractor
       else
         raise StandardError.new(response)
       end
+    end
+
+    def handle_email_challenge2(response)
+      warn "------------------ GOT EMAIL CHALLENGE 2 --------------------"
+
+      path = URI(response.header['location']).path
+      @chp_token = parse_cookies(response)['chp_token']
+      @rt = ('s=%d&r=%s' % [Time.now.to_i + 86353, 'https://' + URI(http.base_uri).host + '/'])
+      response = get(path,
+        headers: {
+          'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+          'accept-language' => 'en-US,en;',
+          'cookie' => (cookies.each.map{ |k,v| '%s="%s"' % [k,v] }.join('; ')),
+          'referer' => 'https://' + URI(http.base_uri).host + '/',
+        }
+      )
+      new_cookies = parse_cookies(response)
+      cookies['leo_auth_token'] = new_cookies['leo_auth_token']
+
+      pin = get_latest_email_challenge_pin(response)
+      warn "/////////////////// PIN(#{pin}) //////////////////////"
+      response = post('/checkpoint/challenge/verify',
+        headers: {
+          'content-type' => 'application/x-www-form-urlencoded',
+          'authority' => URI(http.base_uri).host,
+          'cookie' => (cookies.merge(
+            'chp_token' => @chp_token,
+            'RT' => @rt
+          ).each.map{ |k,v| '%s="%s"' % [k,v] }.join('; ')),
+          'referer' => 'https://' + URI(http.base_uri).host + '/',
+        },
+        follow_redirects: false,
+        body: URI.encode_www_form(
+          'challengeData' => input_value('challengeData', response.body),
+          'challengeDetails' => input_value('challengeDetails', response.body),
+          'challengeSource' => input_value('challengeSource', response.body),
+          'challengeType' => input_value('challengeType', response.body),
+          'csrfToken' => cookies['JSESSIONID'],
+          'displayTime' => input_value('displayTime', response.body),
+          'failureRedirectUri' => input_value('failureRedirectUri', response.body),
+          'language' => input_value('language', response.body),
+          'pageInstance' => input_value('pageInstance', response.body),
+          'requestSubmissionId' => input_value('requestSubmissionId', response.body),
+          'pin' => pin
+        )
+      )
+      case response.code.to_i
+      when 302
+        if response.header['location'] =~ %r{(?:/feed/|/check/add-phone)$}
+          return handle_login_success_response(response)
+        else
+          raise StandardError.new(response)
+        end
+      when 503
+        warn '///// RETRY(%s)...' % path
+        sleep 10
+        return handle_email_challenge2(response)
+      else
+        raise StandardError.new(response)
+      end
+    end
+
+    def input_value(name, body)
+      %r{<input name="#{name}" value="(.+?)"}.match(response.body)[1]
     end
 
     def get_latest_email_challenge_pin(response)
