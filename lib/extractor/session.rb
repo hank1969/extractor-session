@@ -325,7 +325,7 @@ module Extractor
           'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
           'accept-language' => 'en-US,en;',
           'cookie' => (cookies.each.map{ |k,v| '%s="%s"' % [k,v] }.join('; ')),
-          'referer' => 'https://' + URI(http.base_uri).host + '/',
+          'referer' => 'https://' + URI(http.base_uri).host + '/login',
         }
       )
       new_cookies = parse_cookies(response)
