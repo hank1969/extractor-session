@@ -452,7 +452,7 @@ module Extractor
       self.signed_in = true
       if response.header['location'] =~ %r{/check/add-phone$}
         dismiss_phone_check!
-      elsif response.header['location'] !~ %r{/feed/$}
+      elsif response.header['location'] !~ %r{/feed/}
         raise StandardError.new("Unespected location: header -- '#{response.header['location']}'")
       end
 
