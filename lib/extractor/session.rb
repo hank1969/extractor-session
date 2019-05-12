@@ -355,7 +355,8 @@ module Extractor
           'language' => input_value('language', response.body),
           'pageInstance' => input_value('pageInstance', response.body),
           'requestSubmissionId' => input_value('requestSubmissionId', response.body),
-          'pin' => pin
+          'pin' => pin,
+          'resendUrl', '/checkpoint/challenge/resend'
         )
       )
       case response.code.to_i
