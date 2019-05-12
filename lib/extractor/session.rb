@@ -375,7 +375,7 @@ module Extractor
     end
 
     def input_value(name, body)
-      %r{<input name="#{name}" value="(.+?)"}.match(response.body)[1]
+      %r{<input name="#{name}" value="(.+?)"}.match(body)[1]
     end
 
     def get_latest_email_challenge_pin(response)
