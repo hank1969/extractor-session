@@ -361,7 +361,7 @@ module Extractor
       )
       case response.code.to_i
       when 302
-        if response.header['location'] =~ %r{(?:/feed/|/check/add-phone)$}
+        if response.header['location'] =~ %r{(?:/feed/|/check/add-phone)}
           return handle_login_success_response(response)
         else
           raise StandardError.new(response)
@@ -382,7 +382,7 @@ module Extractor
           )
           case response.code.to_i
           when 303
-            if response.header['location'] =~ %r{(?:/feed/|/check/add-phone)$}
+            if response.header['location'] =~ %r{(?:/feed/|/check/add-phone)}
               return handle_login_success_response(response)
             else
               raise StandardError.new(response)
