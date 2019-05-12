@@ -213,8 +213,7 @@ module Extractor
     end
 
     def submit_login!(body)
-      login_csrf_param = %r{<input type="hidden" name="csrfToken" value="(.+?)"/>}.match(body)[1]
-      response = post('/uas/login-submit',
+      response = post('/checkpoint/lg/login-submit',
         follow_redirects: false,
         headers: {
           'content-type' => 'application/x-www-form-urlencoded',
@@ -222,10 +221,17 @@ module Extractor
           'cookie' => (cookies.each.map{ |k,v| '%s="%s"' % [k,v] }.join('; ')),
         },
         body: URI.encode_www_form(
+          _d: input_value('_d', body),
+          ac: input_value('ac', body),
+          controlId: input_value('controlId', body),
+          csrfToken: input_value('csrfToken', body),
+          loginCsrfParam: input_value('loginCsrfParam', body),
+          pageInstance: input_value('pageInstance', body),
+          parentPageKey: input_value('parentPageKey', body),
           session_key: email,
           session_password: password,
-          isJsEnabled: false,
-          loginCsrfParam: login_csrf_param,
+          session_redirect: input_value('session_redirect', body),
+          trk: input_value('trk', body)
         )
       )
       case response.code
