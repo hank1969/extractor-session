@@ -373,8 +373,11 @@ module Extractor
             headers: {
               'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
               'accept-language' => 'en-US,en;',
-              'cookie' => (cookies.each.map{ |k,v| '%s="%s"' % [k,v] }.join('; ')),
-              'referer' => 'https://' + URI(http.base_uri).host + '/uas/login?trk=hb_signin',
+              'cookie' => (cookies.merge(
+                'chp_token' => @chp_token,
+                'RT' => @rt
+              ).each.map{ |k,v| '%s="%s"' % [k,v] }.join('; ')),
+              'referer' => path
             }
           )
           case response.code.to_i
