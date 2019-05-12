@@ -534,6 +534,7 @@ module Extractor
       cookie_hash = {}
       (resp.get_fields('Set-Cookie') || []).each do |cookie|
         cookie = cookie.split(';').first
+        warn cookie
         name, value = %r{^(\w+)\="?(.+?)"?$}.match(cookie)[1,2]
         cookie_hash[name] = value
       end
