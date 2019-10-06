@@ -315,7 +315,6 @@ module Extractor
     end
 
     def handle_email_challenge2(response)
-      warn "------------------ GOT EMAIL CHALLENGE 2 --------------------"
 
       path = 'https://' + URI(http.base_uri).host + response.header['location']
       @chp_token = parse_cookies(response)['chp_token']
@@ -330,6 +329,14 @@ module Extractor
       )
       new_cookies = parse_cookies(response)
       cookies['leo_auth_token'] = new_cookies['leo_auth_token']
+
+      page_instance = input_value('pageInstance', response.body)
+      if page_instance.include?('captcha')
+        raise StandardError.new("unexpected challenge page: #{page_instancee}")
+      else
+        warn "------------------ GOT EMAIL CHALLENGE 2 --------------------"
+        warn "challenge page: #{page_instance}"
+      end
 
       pin = get_latest_email_challenge_pin(response)
       warn "/////////////////// PIN(#{pin}) //////////////////////"
