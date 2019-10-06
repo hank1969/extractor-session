@@ -332,7 +332,7 @@ module Extractor
 
       page_instance = input_value('pageInstance', response.body)
       if page_instance.include?('captcha')
-        raise StandardError.new("unexpected challenge page: #{page_instancee}")
+        raise StandardError.new("unexpected challenge page: #{page_instance}")
       else
         warn "------------------ GOT EMAIL CHALLENGE 2 --------------------"
         warn "challenge page: #{page_instance}"
