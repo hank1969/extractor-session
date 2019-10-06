@@ -6,11 +6,12 @@ module Extractor
 
     delegate :get, :post, :put, :delete, :options, to: :http
 
-    attr_accessor :email, :password, :socks_proxy, :user_agent, :signed_in, :cookies, :http, :profile_url_template
+    attr_accessor :email, :password, :mail_password, :socks_proxy, :user_agent, :signed_in, :cookies, :http, :profile_url_template
 
-    def initialize(email:, password:, socks_proxy: nil, user_agent:, cookies:{}, profile_url_template:, debug: false)
+    def initialize(email:, password:, mail_password:, socks_proxy: nil, user_agent:, cookies:{}, profile_url_template:, debug: false)
       self.email = email
       self.password = password
+      self.mail_password = mail_password
       self.socks_proxy = socks_proxy
       self.user_agent = user_agent
       self.cookies = cookies
@@ -158,6 +159,7 @@ module Extractor
       {
         email: email,
         password: password,
+        mail_password: mail_password,
         socks_proxy: socks_proxy,
         user_agent: user_agent,
         cookies: cookies,
@@ -525,7 +527,7 @@ module Extractor
         address: 'pop.mail.ru',
         port: 995,
         user_name: email,
-        password: password,
+        password: mail_password,
         enable_ssl: true
       )
     end
